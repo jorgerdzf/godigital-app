@@ -1,8 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import * as firebase from 'firebase'
+import firebase from 'firebase/app'
+require('firebase/auth')
 import 'firebase/firestore'
 import { firebaseConfig } from './config/firebaseConfig'
 
@@ -10,6 +11,10 @@ import { Provider } from 'react-redux'
 import { createStore, applyMiddleware } from 'redux'
 import rootReducer from './redux/reducers'
 import thunk from 'redux-thunk'
+
+if(firebase.apps.length === 0) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 const store = createStore(rootReducer, applyMiddleware(thunk))
 
@@ -25,9 +30,7 @@ import PaymentHistory from './components/payment/PaymentHistory'
 import PaymentInfo from './components/payment/PaymentInfo'
 import PaymentPost from './components/payment/PaymentPost'
 
-if (firebase.apps.length === 0) {
-  firebase.initializeApp(firebaseConfig);
-}
+const Stack = createStackNavigator();
 
 export class App extends Component {
   constructor(props) {
@@ -37,7 +40,7 @@ export class App extends Component {
     }
   }
   componentDidMount() {
-    firebase.auth().onAuthStateChange((user) => {
+    firebase.auth().onAuthStateChanged((user) => {
       if (!user) {
         this.setState({
           loggedIn: false,
